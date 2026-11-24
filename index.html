@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>INFINITYHUNT_CUANTUM_CAPITAL · Gestora de Fondos Cuánticos</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { margin: 0; background: #f4f6f9; color: #1e293b; padding-bottom: 105px; }
+    header { background: #ffffff; border-bottom: 3px solid #d4af37; padding: 0.85rem 1.4rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.6rem; }
+    .brand { font-size: 1.18rem; font-weight: 800; color: #ff6200; } .brand span { color: #002d72; }
+    .nav-tabs { background: #ffffff; border-bottom: 1px solid #d4af37; padding: 0.5rem 1.4rem; display: flex; gap: 0.35rem; flex-wrap: wrap; }
+    .tab-btn { background: #f8fafc; color: #334155; border: 1px solid #cbd5e1; padding: 0.42rem 0.78rem; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.78rem; transition: all 0.25s ease; }
+    .tab-btn:hover, .btn:hover { border-color: #d4af37; box-shadow: 0 0 10px rgba(212, 175, 55, 0.45); transform: translateY(-1px); }
+    .tab-btn.active { background: #ff6200; color: #ffffff; border-color: #d4af37; }
+    .bb-bar { background: #002d72; color: #ffffff; overflow: hidden; white-space: nowrap; padding: 0.38rem 0; font-size: 0.78rem; font-weight: 700; border-bottom: 2px solid #d4af37; }
+    .bb-move { display: inline-block; padding-left: 100%; animation: bbticker 28s linear infinite; }
+    @keyframes bbticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+    @keyframes qBlinkGreen { 0%,100% { background:#dcfce7; box-shadow:0 0 10px rgba(5,150,105,0.4); } 50% { background:#bbf7d0; box-shadow:0 0 20px rgba(5,150,105,0.85); } }
+    @keyframes qBlinkRed { 0%,100% { background:#fee2e2; box-shadow:0 0 10px rgba(220,38,38,0.4); } 50% { background:#fecaca; box-shadow:0 0 20px rgba(220,38,38,0.85); } }
+    .box-buy-blink { animation: qBlinkGreen 0.65s infinite; border: 2px solid #059669 !important; }
+    .box-sell-blink { animation: qBlinkRed 0.65s infinite 0.32s; border: 2px solid #dc2626 !important; }
+
+
+
+    .wrap { max-width: 1320px; margin: 1.1rem auto; padding: 0 1rem; }
+    .panel { display: none; } .panel.active { display: block; }
+    .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 1rem; transition: all 0.25s ease; }
+    .card:hover { border-color: #d4af37; box-shadow: 0 6px 18px rgba(212, 175, 55, 0.22); }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 0.9rem; margin-bottom: 1rem; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 0.9rem; margin-bottom: 1rem; }
+    .big-num { font-size: 1.48rem; font-weight: 800; margin: 0.3rem 0; color: #0f172a; }
+    input, select, textarea { background: #ffffff; color: #1e293b; border: 1px solid #cbd5e1; padding: 0.45rem 0.65rem; border-radius: 8px; font-size: 0.83rem; }
+    .btn { background: #002d72; color: #ffffff; border: 1px solid transparent; padding: 0.45rem 0.85rem; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.8rem; transition: all 0.25s ease; }
+    .btn-q { background: #059669; } .btn-o { background: #ff6200; } .btn-d { background: #dc2626; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.81rem; margin-top: 0.45rem; }
+    th, td { text-align: left; padding: 0.46rem 0.42rem; border-bottom: 1px solid #e2e8f0; }
+    tbody tr:hover { background: #fffbeb; }
+
+    .idx-tile { padding: 0.45rem 0.6rem; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; transition: all 0.25s ease; cursor: pointer; }
+    .idx-tile:hover { border-color: #d4af37; background: #fffbeb; box-shadow: 0 4px 12px rgba(212, 175, 55, 0.35); transform: translateY(-2px); }
+  </style>
+</head>
+<body>
+<header>
+  <div><div class="brand">⚛️ INFINITYHUNT_CUANTUM_CAPITAL <span>· Gestora de Fondos Cuánticos</span></div><small id="ih-clocks" style="color:#64748b;">Fondos Cuánticos Globales · Umbral 1.000 M€ · PEUO/HGCN · Madrid</small></div>
+  <div style="display:flex;gap:0.4rem;align-items:center;flex-wrap:wrap;">
+    <select id="user-switcher" style="min-width:210px;font-weight:700;"></select>
+    <button type="button" id="btn-es" class="btn" style="display:inline-flex;align-items:center;gap:5px;"><svg width="18" height="12" viewBox="0 0 3 2"><rect width="3" height="2" fill="#aa151b"/><rect width="3" height="1" y="0.5" fill="#f1bf00"/></svg> ES</button>
+    <button type="button" id="btn-en" class="btn" style="display:inline-flex;align-items:center;gap:5px;"><svg width="18" height="12" viewBox="0 0 60 30"><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></svg> EN</button>
+    <button type="button" id="btn-refresh" class="btn">🔄 Actualizar</button><button type="button" id="btn-audio" class="btn">🔊 Audio ON</button><button type="button" id="btn-panic" class="btn btn-d">🛑 FREEZE ALL</button>
+  </div>
+</header>
+<nav class="nav-tabs">
+  <button type="button" class="tab-btn active" data-tab="tab-global">🌍 1. Posición Global Fondos &amp; σ_ij</button><button type="button" class="tab-btn" data-tab="tab-markets">📊 2. Catálogo 20 Plazas Mundiales</button><button type="button" class="tab-btn" data-tab="tab-super">⚡ 3. Operador Superposición &amp; Riesgo</button><button type="button" class="tab-btn" data-tab="tab-users">👤 4. Partícipes Globales, KYC &amp; Sucesión</button>
+  <button type="button" class="tab-btn" data-tab="tab-ledger">📒 5. Libro Mayor PGC &amp; Fiscal AEAT</button><button type="button" class="tab-btn" data-tab="tab-office">📄 6. Suite Ofimática &amp; Folletos DFI</button><button type="button" class="tab-btn" data-tab="tab-stress">🧪 7. Stress Test &amp; Fondos ESG</button><button type="button" class="tab-btn" data-tab="tab-gov">⚖️ 8. Gobierno CNMV/SEC &amp; Marca Blanca</button>
+</nav>
+<div class="bb-bar"><div class="bb-move">BLOOMBERG LIVE · QUANTUM GLOBAL EQUITY VL 148,92 € (+3,15%) &nbsp;|&nbsp; S&amp;P 500 SUPERPOSITION VL 228,40 $ (+1,12%) &nbsp;|&nbsp; IBEX 35 ALPHA VL 52,40 € (+1,45%) &nbsp;|&nbsp; ORO LBMA XAU 2.634,17 $ (+0,95%) &nbsp;|&nbsp; BTC INST. 64.890,00 $ (+2,35%) &nbsp;|&nbsp; INFINITYHUNT_CUANTUM_CAPITAL ↔ INFINITYHUNT_CUANTUM_BANK</div></div>
+
+
+
+<div class="wrap">
+  <section id="tab-global" class="panel active">
+    <div class="card" style="border:2px solid #d4af37;background:linear-gradient(135deg,#ffffff,#fffbeb);">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.8rem;">
+        <div style="max-width:740px;">
+          <div style="font-size:0.8rem;font-weight:900;color:#002d72;text-transform:uppercase;">THE FIRST QUANTUM OPERATOR &amp; BROKER OF ITS GENERATION WORKING IN SUPERPOSITION EVALUATING TRILLIONS AND TRILLIONS OF ORDERS IN MILLISECONDS. THE INFINITYHUNT QUANTUM ALGORITHM</div>
+          <div style="margin-top:0.35rem;font-size:0.76rem;font-weight:800;color:#059669;"><span id="hero-telemetry">⚡ CAUDAL: 228.4 TB/ms · LATENCIA: 0.004 ms · BLOOMBERG / REUTERS / FIX ACTIVOS</span> &nbsp;|&nbsp; 🟢 SESIÓN CONTINUA 24/7 (SIN BLOQUEOS)</div>
+          <div id="hero-world-sweep" style="margin-top:0.25rem;font-size:0.74rem;font-weight:800;color:#ff6200;">🌐 BARRIDO MUNDIAL ACTIVO: NYSE · NASDAQ · BME Madrid · LSE · TSE Tokio · HKEX · NSE India · Tadawul · Crypto 24/7</div>
+        </div>
+        <div style="text-align:right;background:#ffffff;padding:0.6rem 1rem;border-radius:10px;border:2px solid #d4af37;">
+          <small style="color:#ff6200;font-weight:900;">OBJETIVO PARA EL DÍA: + MIL MILLONES</small>
+          <div id="hero-daily-flow" style="font-size:1.42rem;font-weight:900;color:#0f172a;">18.026.945.704 €</div>
+          <small style="color:#059669;font-weight:800;">Flujo proyectado en tiempo real · Expansión Libre</small>
+        </div>
+      </div>
+      <div class="grid-3" style="margin-top:0.8rem;margin-bottom:0;">
+        <div class="card box-buy-blink" style="margin-bottom:0;"><strong style="color:#059669;font-size:0.82rem;">🟢 OPERADOR DE COMPRA (SUPERPOSICIÓN)</strong><div id="hero-buy-live" style="font-weight:900;color:#0f172a;margin:0.22rem 0;">EJECUTANDO COMPRA · 0.004 ms</div><small style="color:#065f46;font-weight:700;">Evaluando billones de órdenes alcistas</small></div>
+        <div class="card box-sell-blink" style="margin-bottom:0;"><strong style="color:#dc2626;font-size:0.82rem;">🔴 OPERADOR DE VENTA (COBERTURA)</strong><div id="hero-sell-live" style="font-weight:900;color:#0f172a;margin:0.22rem 0;">EJECUTANDO VENTA · 0.004 ms</div><small style="color:#991b1b;font-weight:700;">Cobertura ondulatoria en tiempo real</small></div>
+        <div class="card" style="margin-bottom:0;border:1.5px solid #d4af37;background:#ffffff;"><small style="color:#002d72;font-weight:900;">CAPITAL INICIAL INVERTIDO (MÍN. 250 € · CORTE 1.000 M€)</small><div id="hero-initial-cap" style="font-size:1.15rem;font-weight:900;color:#0f172a;margin:0.18rem 0;">2.251.369.457.343,00 €</div><div style="display:flex;gap:0.35rem;align-items:center;flex-wrap:wrap;"><button type="button" class="btn btn-q" style="padding:3px 9px;" onclick="addInitialCapital250()">+250€</button><button type="button" id="btn-hero-invest" class="btn btn-o" style="padding:3px 9px;" onclick="toggleHeroInvestStream()">⏸ Operando (Corte 1.000 M€)</button><small style="color:#059669;font-weight:800;">🔌 API/FIX INFINITYHUNT_CUANTUM_BANK Activo</small></div></div>
+      </div>
+    </div>
+
+
+    <div class="card" style="background:#fff7ed;border:1.5px solid #d4af37;">
+      <div style="display:flex;gap:0.45rem;flex-wrap:wrap;align-items:center;"><strong style="color:#ff6200;">🤖 Caja Semántica Universal:</strong><input id="copilot-inp" placeholder="Ej: 'crear cuenta de María López, DNI 00512088V' o 'no entiendo inglés'..." style="flex:1;min-width:250px;"><button type="button" id="btn-copilot" class="btn btn-o">Ejecutar</button></div>
+      <div id="semantic-reply-box" style="margin-top:0.35rem;font-size:0.8rem;color:#002d72;font-weight:700;">⚛ Ecuación PEUO/HGCN: σ_ij = C_ijkl·ε_kl − β_ij(T−T0) + H_ij(∇²φ) · Tensor Activo: σ_ij = 1501.0100</div>
+      <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.5rem;padding-top:0.5rem;border-top:1px dashed #cbd5e1;"><select id="fast-country" class="world-country-select" style="width:195px;font-weight:700;"></select><input id="fast-name" placeholder="Nombre completo (ej. Pedro Soros / Aarav Sharma)" style="flex:1;min-width:210px;"><input id="fast-dni" placeholder="Cualquier ID / DNI / Aadhaar / PAN (ej. 123456M)" style="width:235px;"><button type="button" class="btn btn-q" onclick="fastInfiniteRegister()">⚡ Alta Infinita &amp; IBAN</button></div>
+    </div>
+
+    <div class="card" style="border:2px solid #d4af37;background:#ffffff;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.8rem;">
+      <div style="max-width:650px;">
+        <div style="font-size:0.78rem;font-weight:900;color:#002d72;">THE FIRST QUANTUM OPERATOR &amp; BROKER OF ITS GENERATION WORKING IN SUPERPOSITION EVALUATING TRILLIONS AND TRILLIONS OF ORDERS IN MILLISECONDS. THE INFINITYHUNT QUANTUM ALGORITHM</div>
+        <div style="color:#ff6200;font-weight:900;font-size:0.84rem;margin-top:0.25rem;">CREACIÓN CUÁNTICA DIARIA: BILLONES GENERADOS AL DÍA</div>
+        <div id="billions-daily-live" style="font-size:1.38rem;font-weight:900;color:#059669;">10.000.000.000.000,00 € <small style="font-size:0.78rem;color:#64748b;">(10 Billones € · Flujo proyectado en tiempo real)</small></div>
+      </div>
+      <button type="button" class="btn btn-o" onclick="transferAccumulatedToBank()">🏦 Traspasar Ganancias y AEAT</button>
+    </div>
+
+    <div class="grid-3">
+      <div class="card" style="border-top:4px solid #059669;"><small style="color:#64748b;font-weight:700;">PATRIMONIO EN FONDOS (AUM CONSOLIDADO)</small><div id="kpi-total" class="big-num" style="color:#059669;">6.602.349.541.563,56 €</div><small id="kpi-iban" style="color:#475569;">IBAN INFINITYHUNT_CUANTUM_BANK: ES91 2100 0418 4502 0005 1332</small></div>
+      <div class="card" style="border-top:4px solid #ff6200;"><small style="color:#64748b;font-weight:700;">RENDIMIENTOS EXPONENCIALES (MERCADO LIBRE · CORTE 1.000 M€)</small><div id="q-yield-val" class="big-num" style="color:#b45309;">1.000,00 M€</div><div style="display:flex;gap:0.4rem;flex-wrap:wrap;"><button type="button" id="btn-liq-yield" class="btn btn-q">💸 Ejecutar Ingreso (75% / 25%)</button><button type="button" id="btn-new-cycle" class="btn">⚡ Nuevo Ciclo</button></div></div>
+      <div class="card" style="border-top:4px solid #002d72;"><small style="color:#64748b;font-weight:700;">ACUMULADOS INDEPENDIENTES (TITULAR / AEAT)</small><div style="margin:0.35rem 0;font-weight:800;">👤 Titular: <span id="acc-holder-val" style="color:#059669;">0,00 €</span><br>🏛️ AEAT: <span id="acc-aeat-val" style="color:#dc2626;">0,00 €</span></div><button type="button" id="btn-push-bank" class="btn btn-o">🏦 Traspasar Ganancias y AEAT a Banco InfinityHunt</button></div>
+    </div>
+
+
+
+    <div class="card" style="border-left:5px solid #d4af37;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.8rem;">
+      <div><small style="color:#ff6200;font-weight:800;">RETIRADA DE CAPITAL AL BANCO CUÁNTICO &amp; CAJA TRIBUTARIA (1 CLIC)</small><div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.45rem;"><button type="button" class="btn btn-q" onclick="withdrawToQuantumBank('2000M')">💸 2.000 M€</button><button type="button" class="btn btn-q" onclick="withdrawToQuantumBank('3000M')">💸 3.000 M€</button><button type="button" class="btn btn-q" onclick="withdrawToQuantumBank('5000M')">💸 5.000 M€</button><input id="custom-withdraw-inp" type="text" value="2000M" style="width:125px;font-weight:800;"><button type="button" class="btn btn-o" onclick="withdrawToQuantumBank(document.getElementById('custom-withdraw-inp').value)">🚀 Enviar Importe</button></div></div>
+      <div style="background:#f8fafc;padding:0.65rem 0.9rem;border-radius:10px;border:1.5px solid #d4af37;"><small style="color:#64748b;font-weight:800;">TITULAR IDENTIFICADO</small><div id="identified-holder-name" style="font-weight:800;color:#0f172a;margin-top:0.2rem;">👤 José Montes (70891234X)</div><div id="identified-holder-meta" style="font-size:0.78rem;color:#059669;font-family:monospace;font-weight:700;">QID-∞-1026-70891234 · ES23 2100 0418 45 4409 007020</div></div>
+    </div>
+
+    <div class="card"><strong style="color:#002d72;">👤 SELECCIÓN RÁPIDA DE PARTÍCIPES (1 CLIC PARA ACUMULADO Y TRASPASO A INFINITYHUNT_CUANTUM_BANK):</strong><div id="holder-chips" style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.45rem;"></div></div>
+
+    <div class="card" style="border-left:5px solid #ff6200;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.6rem;">
+      <div><strong style="color:#ff6200;">👤 TITULAR ACTIVO, DATOS FISCALES Y CUENTAS VINCULADAS INFINITYHUNT_CUANTUM_BANK</strong><div id="home-holder-details" style="font-size:0.82rem;margin-top:0.25rem;line-height:1.55;"></div></div>
+      <div style="display:flex;gap:0.4rem;"><button type="button" class="btn" onclick="document.querySelector('[data-tab=tab-users]').click()">➕ Alta Nuevo Usuario / KYC</button><button type="button" class="btn btn-q" onclick="document.querySelector('[data-tab=tab-users]').click()">📜 Sucesión</button></div>
+    </div>
+
+    <div class="card" style="border:1.5px solid #d4af37;background:#f8fafc;">
+      <strong style="color:#002d72;">🏛️ SELECTOR MUNDIAL DE CÁMARAS, EMPRESAS COTIZADAS Y ASESOR ALGORÍTMICO CUÁNTICO</strong>
+      <div style="display:flex;gap:0.45rem;flex-wrap:wrap;margin-top:0.55rem;">
+        <select id="world-chamber-select" style="min-width:255px;font-weight:700;" onchange="onChamberSelectChange()"></select>
+        <select id="chamber-company-select" style="min-width:255px;font-weight:700;" onchange="analyzeSelectedCompany()"></select>
+        <button type="button" class="btn btn-o" onclick="analyzeSelectedCompany()">⚛️ Analizar con Algoritmo Cuántico</button>
+      </div>
+      <div id="quantum-advisor-box" style="margin-top:0.6rem;padding:0.7rem 0.9rem;background:#ffffff;border-radius:10px;border:1.5px solid #d4af37;font-size:0.84rem;line-height:1.6;"></div>
+    </div>
+
+
+
+
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;"><strong style="color:#002d72;">🌍 ÍNDICES MUNDIALES · TOP 20 PLAZAS GLOBALES</strong><button type="button" class="btn btn-o" onclick="toggleTop20Panorama()">🌐 Ver Todos los Mercados</button></div>
+      <div id="top20-indices-strip" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:0.45rem;margin-top:0.55rem;"></div>
+      <div id="top20-panorama-box" style="display:none;margin-top:0.75rem;padding:0.75rem;background:#f8fafc;border:1.5px solid #d4af37;border-radius:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.45rem;"><strong style="color:#ff6200;">🌐 PANORÁMICA DE LOS 20 MERCADOS MUNDIALES (FEED REAL)</strong><div style="display:flex;gap:0.35rem;"><button type="button" class="btn btn-q" onclick="refreshRealMarketsFeed()">🔄 Actualizar Mercados Reales</button><button type="button" class="btn btn-d" onclick="toggleTop20Panorama()">✕</button></div></div>
+        <table><thead><tr><th>Índice</th><th>Cotizadas</th><th>Puntos</th><th>Var %</th><th>Acción</th></tr></thead><tbody id="panorama-20-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <div class="card"><strong style="color:#ff6200;">🔌 PASARELA DE SERVIDORES &amp; BANCOS (API/FIX)</strong><div style="display:flex;flex-direction:column;gap:0.4rem;margin-top:0.45rem;"><input id="fix-endpoint-inp" value="wss://bolsa.com"><input id="fix-sender-inp" value="BANK_ES_01"><button type="button" class="btn btn-q" onclick="connectExternalFixGateway()">🔌 Conectar Servidor / Banco</button><small id="fix-status-lbl" style="color:#059669;font-weight:800;">🟢 Modo Local Activo · Sesión persistente</small></div></div>
+      <div class="card"><strong style="color:#dc2626;">🛡️ GESTIÓN DE RIESGO &amp; CIRCUIT BREAKER</strong><div style="display:flex;flex-direction:column;gap:0.4rem;margin-top:0.45rem;"><div style="display:flex;justify-content:space-between;align-items:center;"><small>Stop-Loss %:</small><input id="risk-sl-inp" value="1,5" style="width:85px;text-align:right;"></div><div style="display:flex;justify-content:space-between;align-items:center;"><small>Límite Plaza %:</small><input id="risk-plaza-inp" value="15" style="width:85px;text-align:right;"></div><button type="button" id="btn-kill-switch-home" class="btn btn-d" onclick="toggleGlobalKillSwitch()">🛑 KILL SWITCH · PARADA EMERGENCIA</button></div></div>
+      <div class="card"><strong style="color:#002d72;">📐 PARÁMETROS DE MODELO &amp; 5 REGLAS</strong><div style="display:flex;gap:0.4rem;margin-top:0.45rem;"><input id="mod-param-1" value="1,5" oninput="recalcSigmaModelLive()" style="width:50%;"><input id="mod-param-2" value="0,02" oninput="recalcSigmaModelLive()" style="width:50%;"></div><div style="margin:0.45rem 0;padding:0.45rem;background:#f8fafc;border:1px solid #d4af37;border-radius:8px;text-align:center;font-weight:900;color:#0f172a;">Índice Modelo σ_ij: <span id="sigma-model-val" style="color:#059669;">1.6625</span></div><small style="color:#64748b;">5 Reglas Activas: Superposición · Cobertura · Sin Bloqueo · Auto-SL · Auditoría HGCN</small></div>
+    </div>
+
+
+
+
+
+
+
+    <div class="card" style="border:2px solid #d4af37;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.55rem;">
+        <div id="cat-filter-bar" style="display:flex;gap:0.35rem;flex-wrap:wrap;">
+          <button type="button" class="btn btn-o" onclick="setGlobalCategoryFilter('ALL',this)">Todos (252)</button>
+          <button type="button" class="btn" onclick="setGlobalCategoryFilter('CRYPTO',this)">Criptomonedas (20)</button>
+          <button type="button" class="btn" onclick="setGlobalCategoryFilter('EQUITY',this)">Renta Variable (200)</button>
+          <button type="button" class="btn" onclick="setGlobalCategoryFilter('MINERALS',this)">Minerales (20)</button>
+          <button type="button" class="btn" onclick="setGlobalCategoryFilter('FOREX',this)">Divisas Forex (12)</button>
+        </div>
+        <span style="background:#002d72;color:#fcd34d;padding:0.35rem 0.7rem;border-radius:8px;font-weight:900;font-size:0.78rem;">⚡ CONTROL GLOBAL: BILLONES Y BILLONES DE ÓRDENES SIMULTÁNEAS</span>
+      </div>
+      <div class="grid-2">
+        <div style="border:2px solid #059669;background:#f0fdf4;border-radius:10px;padding:0.55rem;max-height:380px;overflow-y:auto;"><div style="color:#059669;font-weight:900;font-size:0.82rem;margin-bottom:0.35rem;">🟢 VENTANA COMPRA (BUY) · <span id="buy-col-cnt">0</span></div><table><thead><tr><th>Activo / Cámara</th><th>Precio</th><th>Var %</th><th>Acciones</th><th>Orden</th></tr></thead><tbody id="dual-buy-tbody"></tbody></table></div>
+        <div style="border:2px solid #dc2626;background:#fef2f2;border-radius:10px;padding:0.55rem;max-height:380px;overflow-y:auto;"><div style="color:#dc2626;font-weight:900;font-size:0.82rem;margin-bottom:0.35rem;">🔴 VENTANA VENTA (SELL) · <span id="sell-col-cnt">0</span></div><table><thead><tr><th>Activo / Cámara</th><th>Precio</th><th>Var %</th><th>Acciones</th><th>Orden</th></tr></thead><tbody id="dual-sell-tbody"></tbody></table></div>
+      </div>
+    </div>
+
+
+
+
+    <div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.8rem;">
+      <div><strong style="color:#ff6200;">📊 DISTRIBUCIÓN PATRIMONIAL SVG EN VIVO &amp; HUCHAS DE INVERSIÓN</strong><div style="font-size:0.82rem;margin-top:0.3rem;">• Renta Variable Global (20 Plazas): <strong>55%</strong> · • Oro LBMA &amp; Materias: <strong>20%</strong> · • Deuda Soberana AAA: <strong>15%</strong> · • Cripto Inst.: <strong>10%</strong></div><button type="button" class="btn btn-q" style="margin-top:0.45rem;" onclick="createInvestmentPiggyBank()">🐷 + Nueva Hucha Inversión InfinityHunt</button></div>
+      <svg width="105" height="105" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.9" fill="none" stroke="#e2e8f0" stroke-width="4"/><circle cx="18" cy="18" r="15.9" fill="none" stroke="#ff6200" stroke-width="4" stroke-dasharray="55 45"/><circle cx="18" cy="18" r="15.9" fill="none" stroke="#059669" stroke-width="4" stroke-dasharray="25 75" stroke-dashoffset="-55"/><circle cx="18" cy="18" r="15.9" fill="none" stroke="#002d72" stroke-width="4" stroke-dasharray="20 80" stroke-dashoffset="-80"/></svg>
+    </div>
+
+    <div class="card" style="border-left:5px solid #d4af37;">
+      <div style="display:flex;justify-content:space-between;align-items:center;"><strong style="color:#002d72;">⬛ CAJA NEGRA INSTITUCIONAL · HGCN (AUDITORÍA MADRID)</strong><button type="button" class="btn" onclick="exportHgcnLogTxt()">⬇ Exportar Log</button></div>
+      <div id="hgcn-stream-home" style="font-family:monospace;font-size:0.78rem;max-height:175px;overflow-y:auto;margin-top:0.45rem;line-height:1.5;color:#334155;"></div>
+    </div>
+  </section>
+
+  <!-- PESTAÑA 2: Catálogo Universal 20 Plazas Mundiales -->
+  <section id="tab-markets" class="panel">
+    <div class="card" style="border:1.5px solid #d4af37;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.5rem;"><strong style="color:#ff6200;">📊 Catálogo Universal de Fondos Cuánticos · Top 20 Plazas Mundiales</strong><input type="text" id="markets-search-inp" placeholder="🔍 Buscar entre las 20 plazas mundiales, Oro LBMA, Cripto o Deuda AAA..." style="min-width:340px;"></div>
+      <table><thead><tr><th>Fondo / Plaza</th><th>VL / Precio</th><th>Var %</th><th>Suscribir</th><th>Reembolsar</th></tr></thead><tbody id="funds-tbody"></tbody></table>
+    </div>
+  </section>
+
+
+
+  <!-- PESTAÑA 3: Operador Superposición & Riesgo + Mesa Forward FX -->
+  <section id="tab-super" class="panel">
+    <div class="grid-3">
+      <div class="card"><strong style="color:#ff6200;">⚡ Operador en Superposición (0,004 ms) &amp; Calibración PEUO</strong><div style="margin-top:0.5rem;font-size:0.84rem;">Elasticidad Cuántica C_ijkl: <strong id="lbl-c">1.5</strong> <input id="sl-c" type="range" min="0.5" max="3" step="0.1" value="1.5" style="width:100%;"></div><div style="margin-top:0.4rem;font-size:0.84rem;">Amortiguación β_ij: <strong id="lbl-b">0.02</strong> <input id="sl-b" type="range" min="0.01" max="0.2" step="0.01" value="0.02" style="width:100%;"></div><button type="button" id="btn-super-exec" class="btn btn-q" style="width:100%;margin-top:0.55rem;">⚡ Ejecutar Asignación Paralela Multi-Fondo (50 M€)</button></div>
+      <div class="card"><strong style="color:#dc2626;">🛡️ Control de Riesgo y Coberturas</strong><div style="font-size:0.84rem;margin:0.55rem 0;line-height:1.7;">• Stop-Loss Cuántico: <strong>Activo (1,5%)</strong><br>• Límite Máximo por Plaza: <strong>25% AUM</strong><br>• Tensor σ_ij Calibrado: <strong id="super-sigma" style="color:#002d72;">1501.0100</strong></div><button type="button" id="btn-kill-switch" class="btn btn-d" style="width:100%;">🛑 KILL SWITCH · PARADA EMERGENCIA</button></div>
+      <div class="card"><strong style="color:#002d72;">💱 Mesa de Coberturas Forward FX (30/90/180 días)</strong><div style="display:flex;flex-direction:column;gap:0.45rem;margin-top:0.55rem;"><select id="fx-pair-sel"><option value="EUR/USD · Seguro 1,0859">EUR/USD · Seguro 1,0859</option><option value="GBP/USD · Seguro 1,2939">GBP/USD · Seguro 1,2939</option><option value="USD/JPY · Seguro 154,20">USD/JPY · Seguro 154,20</option><option value="EUR/CHF · Seguro 0,9644">EUR/CHF · Seguro 0,9644</option></select><select id="fx-days-sel"><option value="30 días">Plazo: 30 días</option><option value="90 días" selected>Plazo: 90 días</option><option value="180 días">Plazo: 180 días</option></select><button type="button" id="btn-fix-fx" class="btn btn-o" onclick="fixForwardFxHedge()">Fijar Cobertura</button></div></div>
+    </div>
+  </section>
+
+  <!-- PESTAÑA 4: Partícipes Globales, KYC & Sucesión -->
+  <section id="tab-users" class="panel">
+    <div class="card" style="border-top:4px solid #d4af37;"><strong style="color:#ff6200;">🌍 Alta Mundial de Partícipe, KYC &amp; Vinculación INFINITYHUNT_CUANTUM_BANK</strong><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:0.45rem;margin-top:0.6rem;"><select id="kyc-country" class="world-country-select" style="font-weight:700;"></select><input id="kyc-name" placeholder="Nombre y Apellidos"><input id="kyc-nif" placeholder="NIF / Pasaporte / Aadhaar / PAN"><input id="kyc-address" placeholder="Domicilio Fiscal"><input id="kyc-heir" placeholder="Beneficiario Sucesión (Opcional)"><button type="button" id="btn-reg-user" class="btn btn-o">✅ Registrar Partícipe y Crear IBAN</button></div></div>
+    <div class="card"><strong style="color:#002d72;">🏦 Partícipes Mundiales Registrados, KYC y Sucesión</strong><div id="users-registry" style="margin-top:0.5rem;"></div></div>
+  </section>
+
+
+
+  <!-- PESTAÑA 5: Libro Mayor PGC & Fiscal AEAT -->
+  <section id="tab-ledger" class="panel">
+    <div class="card" style="border-color:#059669;"><strong style="color:#059669;">🔄 Traspaso entre Fondos sin Peaje Fiscal · Semáforo: DEBE = HABER (100% CUADRADO)</strong><div style="display:flex;gap:0.45rem;flex-wrap:wrap;margin-top:0.55rem;"><input id="sw-src" value="Madrid · IBEX 35 Quantum" style="flex:1;"><input id="sw-dst" value="NASDAQ 100 · AI Quantum" style="flex:1;"><input id="sw-amt" value="25000000" style="width:140px;"><button type="button" id="btn-taxfree-switch" class="btn btn-q">🔄 Traspasar</button><button type="button" id="btn-settle-aeat" class="btn btn-o">🏛️ Liquidar Mod. 123 / IRPF</button></div></div>
+    <div class="card"><strong style="color:#002d72;">📒 LIBRO MAYOR CONTABLE PGC · PARTIDA DOBLE (DEBE = HABER)</strong><table><thead><tr><th>Asiento</th><th>Fecha</th><th>Cuenta PGC</th><th>Concepto</th><th>Debe (€)</th><th>Haber (€)</th></tr></thead><tbody id="ledger-tbody"></tbody></table></div>
+  </section>
+
+  <!-- PESTAÑA 6: Suite Ofimática & Folletos DFI -->
+  <section id="tab-office" class="panel">
+    <div class="card"><strong style="color:#ff6200;">📄 Suite Ofimática Ejecutiva (Excel / Word / PDF)</strong><div style="display:flex;gap:0.45rem;flex-wrap:wrap;margin-top:0.6rem;"><button type="button" id="btn-xls" class="btn btn-q">📊 Libro Mayor y VL Fondos (Excel CSV)</button><button type="button" id="btn-doc-dfi" class="btn">📘 Folleto DFI y Memoria (Word)</button><button type="button" id="btn-doc-cert" class="btn btn-o">🏦 Certificado Traspaso InfinityHunt Bank (Word)</button><button type="button" onclick="window.print()" class="btn">🖨️ Imprimir / Guardar PDF Oficial</button></div></div>
+    <div class="card"><strong style="color:#002d72;">✍️ Editor Dinámico ({{TITULAR}}, {{NIF}}, {{IBAN_IH}}, {{AUM}})</strong><textarea id="office-editor" rows="3" style="width:100%;margin-top:0.5rem;">CERTIFICADO INFINITYHUNT_CUANTUM_CAPITAL: Partícipe {{TITULAR}} (NIF/ID {{NIF}}), IBAN INFINITYHUNT_CUANTUM_BANK {{IBAN_IH}}, patrimonio consolidado en fondos {{AUM}}.</textarea><button type="button" id="btn-doc-custom" class="btn btn-o" style="margin-top:0.5rem;">⬇️ Descargar Documento Word Oficial</button></div>
+  </section>
+
+
+
+  <!-- PESTAÑA 7: Stress Test & Fondos ESG -->
+  <section id="tab-stress" class="panel">
+    <div class="grid-2">
+      <div class="card" style="border-top:4px solid #002d72;"><strong style="color:#002d72;">🧪 Stress Test Macroeconómico (BCE / FED) &amp; Fondos ESG Art. 9</strong><div style="margin:0.6rem 0;">Escenario Tipos Interés (%): <input id="stress-rate" type="number" step="0.5" value="3.5" style="width:90px;font-weight:800;"></div><div id="stress-out" style="color:#059669;font-weight:800;font-size:0.86rem;">Rentabilidad Anual Proyectada (3,5%): +35.000.000,00 € · Cartera ESG Sostenible: 100% Art. 9 SFDR</div></div>
+      <div class="card" style="border-top:4px solid #059669;"><strong style="color:#059669;">📊 Ratios Cuánticos Institucionales</strong><div style="font-size:0.9rem;margin-top:0.6rem;line-height:1.7;">• Ratio Sharpe: <strong style="color:#b45309;">3,42</strong> · • Ratio Sortino: <strong style="color:#b45309;">4,18</strong> · • Alpha Cuántico: <strong style="color:#059669;">+18,5%</strong></div></div>
+    </div>
+  </section>
+
+  <!-- PESTAÑA 8: Gobierno CNMV/SEC & Marca Blanca + Caja Negra HGCN -->
+  <section id="tab-gov" class="panel">
+    <div class="grid-3">
+      <div class="card"><strong style="color:#059669;">⚖️ Auditoría CNMV / SEC</strong><p style="font-size:0.84rem;">Conciliación T+0 con <strong>INFINITYHUNT_CUANTUM_BANK</strong>: <strong style="color:#059669;">100% Verificada</strong></p><button type="button" class="btn btn-q" style="width:100%;" onclick="exportCapitalVault()">💾 Exportar Bóveda Completa (.JSON)</button></div>
+      <div class="card"><strong style="color:#ff6200;">🏢 Marca Blanca Institucional</strong><div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><input id="wl-inp" value="INFINITYHUNT_CUANTUM_CAPITAL" style="flex:1;"><button type="button" id="btn-wl" class="btn btn-o">Aplicar</button></div></div>
+      <div class="card"><strong style="color:#002d72;">⬛ Caja Negra Institucional · HGCN</strong><button type="button" class="btn" style="width:100%;margin-top:0.5rem;" onclick="exportHgcnLogTxt()">⬇️ Exportar Log HGCN (.TXT)</button></div>
+    </div>
+    <div class="card" style="border-left:5px solid #d4af37;"><strong style="color:#ff6200;">⬛ STREAM INMUTABLE · CAJA NEGRA INSTITUCIONAL HGCN (AUDITORÍA MADRID)</strong><div id="hgcn-stream" style="font-family:monospace;font-size:0.78rem;max-height:220px;overflow-y:auto;margin-top:0.5rem;line-height:1.55;color:#334155;"></div></div>
+  </section>
+</div>
+
+
+<!-- RELOJES EN VIVO DE LOS MERCADOS MUNDIALES DE FONDOS DE INVERSIÓN -->
+<footer style="position:fixed;bottom:0;left:0;right:0;z-index:9000;background:#ffffff;border-top:2px solid #d4af37;padding:0.42rem 1.2rem;font-size:0.76rem;font-weight:700;color:#002d72;display:flex;gap:1rem;flex-wrap:wrap;align-items:center;">
+  <span style="color:#ff6200;font-weight:900;">🕒 MERCADOS DE FONDOS EN VIVO:</span>
+  <span id="world-markets-clocks">Madrid/Fráncfort: --:-- · Londres: --:-- · Zúrich: --:-- · Nueva York: --:-- · Tokio: --:-- · Hong Kong: --:-- · Singapur: --:-- · Bombay: --:--</span>
+</footer>
+
+<!-- BARRA FLOTANTE EJECUTIVA DE RETIRADA DIRECTA AL BANCO -->
+<div style="position:fixed;bottom:38px;right:14px;z-index:9999;background:#002d72;color:#fff;padding:9px 13px;border-radius:10px;border:2px solid #d4af37;display:flex;gap:7px;align-items:center;flex-wrap:wrap;box-shadow:0 4px 14px rgba(0,0,0,0.28);font-size:12.5px;">
+  <strong>⚛️ Titular Retirada:</strong>
+  <input id="bridge-holder-name" type="text" value="José Montes" style="width:135px;padding:4px 7px;border-radius:6px;border:1px solid #d4af37;font-weight:700;color:#0f172a;">
+  <input id="bridge-custom-amt" type="text" value="3000M" style="width:82px;padding:4px 7px;border-radius:6px;border:1px solid #d4af37;font-weight:700;color:#0f172a;">
+  <button type="button" id="btn-open-ih-bank" class="btn" style="background:#1e293b;border:1px solid #d4af37;padding:5px 9px;">🏦 Banco</button>
+  <button type="button" id="btn-send-custom" class="btn btn-o" style="padding:5px 11px;">🚀 Enviar Fondos</button>
+</div>
+
+<script src="quantum_capital.js?v=2026"></script>
+
+
+</body>
+</html>
